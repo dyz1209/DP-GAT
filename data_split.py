@@ -53,7 +53,7 @@ def prepare_data_for_training(df, *, step=256, nodes_per_class=62,
             values = df[col].dropna().to_numpy(dtype=np.float32)
             required_len = step * n_per_class
             if len(values) < required_len:
-                raise ValueError(f"类别 {col} 数据不足，需要 {required_len} 点，实际 {len(values)} 点")
+                raise ValueError(f"Insufficient data for class {col}: {required_len} samples required, {len(values)} available")
             samples = torch.as_tensor(values[:required_len], device=device).reshape(n_per_class, step)
             class_samples = torch.cat((
                 samples[train_idx], samples[val_idx], samples[test_idx]
@@ -95,10 +95,10 @@ def prepare_data_for_training(df, *, step=256, nodes_per_class=62,
     for class_idx, col in enumerate(df.columns):
         series_data = df[col].dropna().values
 
-        # 检查当前类别数据是否足够进行无重叠截取
+        # Check that this class has enough data for non-overlapping windows.
         required_len = step * n_per_class
         if len(series_data) < required_len:
-            raise ValueError(f"类别 {col} 数据不足，需要 {required_len} 点，实际只有 {len(series_data)} 点")
+            raise ValueError(f"Insufficient data for class {col}: {required_len} samples required, {len(series_data)} available")
 
         class_samples = []
         for i in range(n_per_class):
